@@ -1,0 +1,176 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="{% static 'assets/img/favicon.ico' %}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calorie Tracker Coding Assignment - User Data</title>
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="{% static 'assets/css/global.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <div>
+        {% include "header.html" %} 
+        <div class="mid-container">
+            <div class="container user-all-date-data">
+                <div class="title-row">
+                    <h1 class="title">{{ user.name }}</h1> 
+                    <div class="title-row-right">
+                        <button class="btn-primary add-data-btn" data-toggle="modal" data-target="#addDataModal"
+                            data-userid="{{ user.id }}">Add Data</button>
+                    </div>
+                </div>
+                <div class="date-input-card">
+                    <div class="date-input">
+                        <input type="date" id='filter-date' placeholder="Age" autocomplete="off">
+                    </div>
+                </div>
+                <div class="user-list ">
+                    <div class="white-card">
+                        <h2>All Data</h2>
+                        <form method="post" action="{% url 'view_date_data' %}">
+                            {% csrf_token %}
+                            {% if data_by_date %}
+                            <table id='data-table'
+                                class="dcf-table dcf-table-responsive dcf-table-bordered dcf-table-striped dcf-w-100%">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">BMR</th>
+                                        <th scope="col">Calorie In</th>
+                                        <th scope="col">Calorie Out</th>
+                                        <th scope="col">Net Calorie</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for date, data in data_by_date.items %}
+                                    <tr>
+                                        <th scope="row" name="selected_date">{{ data.date }}</th>
+                                        <td data-label="user-id" hidden="true" name="id">{{ user.id }}</td>
+                                        <td data-label="BMR" name="bmr">{{ data.bmr }}</td>
+                                        <td data-label="Calorie In" name="calorieIn">{{ data.calorie_in|floatformat:2 }}</td>
+                                        <td data-label="Calorie Out" name="calorieOut">{{ data.calorie_out|floatformat:2 }}</td>
+                                        <td data-label="Net Calorie" name="netCalorie">{{ data.net_calorie|floatformat:2 }}</td>
+                                        <td data-label="Action">
+                                            <div class="btn-set">
+                                                <button type="submit" class="btn-secondary" name="selected_date"
+                                                    value="{{ data.date }}">View</button>
+                                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <h4 style="text-align: center;">No data found</h4>
+                            {% endif %}
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include "footer.html" %} 
+    </div>
+  
+    {% include "activity-food-popup.html" %} 
+
+   
+</body>
+<script src="{% static 'assets/js/jquery.slim.min.js' %}"></script>
+<script src="{% static 'assets/js/popper.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/custom.js' %}"></script>
+<div id="foodJsonFilePath" data-path="{% static 'food-calories.json' %}"></div>
+<script src="{% static 'assets/js/food-script.js' %}"></script>
+<div id="activityJsonFilePath" data-path="{% static 'met-value.json' %}"></div>
+<script src="{% static 'assets/js/activity-script.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $('.add-data-btn').click(function () {
+            var userId = $(this).data('userid');
+            $('#userIdInput').val(userId);
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.add-data-btn').click(function () {
+            var userId = $(this).data('userid');
+            $('#userIdInput2').val(userId);
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterDateInput = document.getElementById('filter-date');
+        const rows = document.querySelectorAll('#data-table tbody tr');
+
+        filterDateInput.addEventListener('change', function () {
+            const selectedDate = this.value.trim(); 
+            const formattedDate = formatDate(selectedDate);
+            console.log(formattedDate)
+            if (formattedDate === 'Invalid Date') {
+                location.reload();
+            }
+            console.log(formattedDate)
+            rows.forEach(row => {
+                const dateCell = row.querySelector('th');
+                if (dateCell.textContent.trim() === formattedDate) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            var formattedDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            return formattedDate;
+        }
+
+
+    });
+</script>
+
+</html>

@@ -1,0 +1,66 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="{% static 'assets/img/favicon.ico' %}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calorie Tracker Coding Assignment - Sign up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="{% static 'assets/css/global.css' %}" rel="stylesheet">
+</head>
+<body>
+<div>
+{% include "header.html" %} 
+    <div class="mid-container">
+        <div class="signup-container">
+            <div class="white-card">
+                <h1>Sign Up</h1>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'signUpBtnClick' %}">
+                        <div class="input-field">
+                            <label for="id_name">Name</label>
+                            <input type="text" name="name" id="id_name" placeholder="Name" autocomplete="off" required />
+                        </div>
+                        <div class="input-field">
+                            <label for="id_weight">Weight(in Kilograms)</label>
+                            <input type="text" name="weight" id="id_weight" placeholder="Weight" autocomplete="off"  required/>
+                        </div>
+                        <div class="input-field">
+                            <label for="id_height">Height(in Centimeters)</label>
+                            <input type="text" name="height" id="id_height" placeholder="Height"  autocomplete="off" required/>
+                        </div>
+                        <div class="input-field">
+                            <label for="id_gender">Gender</label>
+                            <select name="gender" id="id_gender" class="selectbox">
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                        <div class="input-field">
+                            <label for="id_age">Age(in Years)</label>
+                            <input type="text" name="age" id="id_age" placeholder="Age" autocomplete="off" required />
+                        </div>
+                        <div class="input-field btn-set--right">
+                            <div class="btn-set">
+                                <button type="submit" class="btn-primary" >Sign Up</button>
+                                <a class="btn-secondary" href="userList">User List</a>
+    
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "footer.html" %} 
+</div>
+</body>
+<script src="{% static 'assets/js/jquery.slim.min.js' %}"></script>
+<script src="{% static 'assets/js/popper.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/custom.js' %}"></script>
+</html>

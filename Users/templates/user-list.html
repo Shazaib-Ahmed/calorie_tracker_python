@@ -1,0 +1,133 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="{% static 'assets/img/favicon.ico' %}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calorie Tracker Coding Assignment - User List</title>
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="{% static 'assets/css/global.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <div>
+        {% include "header.html" %} 
+        <div class="mid-container">
+            <div class="container">
+                <div class="title-row">
+                    <h1 class="title">User List</h1>
+                </div>
+                <div class="user-list">
+                    <table class="dcf-table dcf-table-responsive dcf-table-bordered dcf-table-striped dcf-w-100%">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="name">Name</th>
+                                <th scope="col" class="weight">Weight</th>
+                                <th scope="col" class="height">Height</th>
+                                <th scope="col" class="gender">Gender</th>
+                                <th scope="col" class="age">Age</th>
+                                <th scope="col" class="bmr">BMR</th>
+                                <th scope="col" class="action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users reversed %}
+                            <tr>
+                                <th scope="row">{{ user.name }}</th>
+                                <td data-label="Weight">{{ user.weight }}</td>
+                                <td data-label="Height">{{ user.height }}</td>
+                                <td data-label="Gender">{{ user.sex }}</td>
+                                <td data-label="Age">{{ user.age }}</td>
+                                <td>{{ user.bmr }}</td>
+                                <td data-label="Action">
+                                    <div class="btn-set">
+
+                                        <a class="btn-secondary" href="view_user_data/{{user.id}}">View</a>
+
+
+                                        <button class="btn-primary add-data-btn" data-toggle="modal"
+                                            data-target="#addDataModal" data-userid="{{ user.id }}">Add Data</button>
+                                        <form method="post" action="{% url 'delete_user' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            <button class="btn-secondary" type="submit">Delete</button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% include "footer.html" %} 
+    </div>
+
+    {% include "activity-food-popup.html" %} 
+
+</body>
+<script src="{% static 'assets/js/jquery.slim.min.js' %}"></script>
+<script src="{% static 'assets/js/popper.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/custom.js' %}"></script>
+<div id="foodJsonFilePath" data-path="{% static 'food-calories.json' %}"></div>
+<script src="{% static 'assets/js/food-script.js' %}"></script>
+<div id="activityJsonFilePath" data-path="{% static 'met-value.json' %}"></div>
+<script src="{% static 'assets/js/activity-script.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $('.add-data-btn').click(function () {
+            var userId = $(this).data('userid');
+            $('#userIdInput').val(userId);
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.add-data-btn').click(function () {
+            var userId = $(this).data('userid');
+            $('#userIdInput2').val(userId);
+        });
+    });
+</script>
+<script src="{% static 'assets/js/date-script.js' %}"></script>
+
+</html>

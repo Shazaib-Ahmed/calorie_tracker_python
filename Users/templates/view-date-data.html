@@ -1,0 +1,236 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="{% static 'assets/img/favicon.ico' %}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calorie Tracker Coding Assignment - User Data Details</title>
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="{% static 'assets/css/global.css' %}" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div>
+        {% include "header.html" %} 
+        <div class="mid-container">
+            <div class="container">
+                <div class="title-row">
+                    <h1 class="title">{{ user_name }}</h1>
+                    <div class="title-row-right">
+                        <button class="btn-primary add-data-btn" data-toggle="modal" data-target="#addDataModal"
+                            data-userid="{{ user.id }}">Add Data</button>
+                    </div>
+                </div>
+                <div class="view-calorie-data">
+                    <div class="view-calorie-data-date-input">
+                        <div class="date-input">
+                            <form id="dateForm" method="GET" action="{% url 'view_date_data' %}">
+                                <input type="hidden" id="user_id" name="user_id" value="{{ user.id }}">
+                                <input type="date" id="selectedDate" name="selected_date" placeholder="Select Date"
+                                    onchange="this.form.submit()" value="{{ selectedDate }}">
+                            </form>
+                        </div>
+
+                        <div class="show-selected-date">
+                            Date : {{selectedDate}}
+                            
+                        </div>
+                    </div>
+                    <div class="view-calorie-data-chart">
+                        <div class="food-data white-card">
+                            <h2>Food Data</h2>
+                            <div class="food-data-table">
+                                {% if food_data %}
+                                <table
+                                    class="dcf-table dcf-table-responsive dcf-table-bordered dcf-table-striped dcf-w-100%">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Meal Type</th>
+                                            <th scope="col">Food Group</th>
+                                            <th scope="col">Serving</th>
+                                            <th scope="col">Calorie In</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for food_item in food_data %}
+                                        <tr>
+                                            <th scope="row">{{ food_item.date }}</th>
+                                            <td data-label="Meal Type">{{ food_item.meal_type }}</td>
+                                            <td data-label="Food Group">{{ food_item.food_group }}</td>
+                                            <td data-label="Serving">{{ food_item.serving }}</td>
+                                            <td data-label="Calorie In">{{ food_item.calorie_in|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                {% else %}
+                                <h5 style="text-align: center;">No food data found</h5>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                        <div class="activity-data white-card">
+                            <h2>Activity Data</h2>
+                            <div class="activity-data-table">
+                                {% if activity_data %}
+                                <table
+                                    class="dcf-table dcf-table-responsive dcf-table-bordered dcf-table-striped dcf-w-100%">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Description</th>
+                                            <th scope="col">MET Value</th>
+                                            <th scope="col">Duration</th>
+                                            <th scope="col">Calorie Out</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for activity_item in activity_data %}
+                                        <tr>
+                                            <th scope="row">{{ activity_item.date }}</th>
+                                            <td data-label="Name">{{ activity_item.activity_name }}</td>
+                                            <td data-label="Description">{{ activity_item.activity_description }}</td>
+                                            <td data-label="MET Value">{{ activity_item.met_value }}</td>
+                                            <td data-label="Duration">{{ activity_item.duration }}</td>
+                                            <td data-label="Calorie Out">{{ activity_item.calorie_out|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                {% else %}
+                                <h5 style="text-align: center;">No activity data found</h5>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                        <div class="net-calorie-data white-card">
+                            <h2>Net Calorie</h2>
+                            <div class="net-calorie-table">
+                                <div class="net-calorie-row">
+                                    <strong>BMR: </strong>
+                                    <span>-{{ user.bmr }}</span>
+                                </div>
+
+                                <div class="net-calorie-row">
+                                    <strong>Food: </strong>
+                                    <span>+{{ calorieIn }}</span>
+                                </div>
+                                <div class="net-calorie-row">
+                                    <strong>Activity: </strong>
+                                    <span>-{{ calorieOut }}</span>
+                                </div>
+                                <div class="net-calorie-row net-calorie-totl">
+                                    <strong>Net Calorie:</strong>
+                                    <span>{{ netCalorie|floatformat:2 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include "footer.html" %} 
+    </div>
+    
+    {% include "activity-food-popup.html" %} 
+   
+</body>
+<script src="{% static 'assets/js/jquery.slim.min.js' %}"></script>
+<script src="{% static 'assets/js/popper.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/custom.js' %}"></script>
+<div id="foodJsonFilePath" data-path="{% static 'food-calories.json' %}"></div>
+<script src="{% static 'assets/js/food-script.js' %}"></script>
+<div id="activityJsonFilePath" data-path="{% static 'met-value.json' %}"></div>
+<script src="{% static 'assets/js/activity-script.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $('.add-data-btn').click(function () {
+            var userId = $(this).data('userid');
+            $('#userIdInput').val(userId);
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.add-data-btn').click(function () {
+            var userId = $(this).data('userid');
+            $('#userIdInput2').val(userId);
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterDateInput = document.getElementById('filter-date');
+        const rows = document.querySelectorAll('#data-table tbody tr');
+
+        
+        filterDateInput.addEventListener('change', function () {
+            const selectedDate = this.value.trim(); 
+            const formattedDate = formatDate(selectedDate);
+            console.log(formattedDate)
+            if (formattedDate === 'Invalid Date') {
+                location.reload();
+            }
+            console.log(formattedDate)
+            rows.forEach(row => {
+                const dateCell = row.querySelector('th');
+                if (dateCell.textContent.trim() === formattedDate) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+       
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            var formattedDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            return formattedDate;
+        }
+
+
+    });
+</script>
+
+</html>
